@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -19,21 +18,26 @@ class UserSeeder extends Seeder
             'name' => 'Admin User',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('123456789'),
-            'type' => 'admin'
+            'type' => 'admin',
+            'is_active' => true,
+
         ]);
 
-         User::create([
+        User::create([
             'name' => 'Manager User',
             'email' => 'manager@gmail.com',
             'password' => Hash::make('123456789'),
-            'type' => 'manager'
+            'type' => 'manager',
+            'is_active' => true,
         ]);
 
-         User::create([
+        User::create([
             'name' => 'Normal User',
             'email' => 'user@gmail.com',
             'password' => Hash::make('123456789'),
-            'type' => 'user'
+            'type' => 'user',
+            'is_active' => true,
+
         ]);
     }
 }

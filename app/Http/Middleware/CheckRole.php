@@ -10,9 +10,12 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, string $role): Response
     {
+        if (! auth()->check()) {
+            return redirect()->route('login');
+        }
 
-        if (auth()->check() && auth()->user()->type !== $role) {
-            abort(403, 'You are not allowed to access this panel.');
+        if (auth()->user()->type !== $role) {
+            abort(403);
         }
 
         return $next($request);

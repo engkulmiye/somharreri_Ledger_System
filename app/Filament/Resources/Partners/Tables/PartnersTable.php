@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Partners\Tables;
 
-use Dom\Text;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -17,11 +16,11 @@ class PartnersTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                ,
+                TextColumn::make('id'),
                 TextColumn::make('name')
                     ->searchable(),
                 IconColumn::make('is_active')
+                    ->label('Status')
                     ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime()

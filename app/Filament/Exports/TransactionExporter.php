@@ -19,7 +19,7 @@ class TransactionExporter extends Exporter
             ExportColumn::make('id'),
             ExportColumn::make('date'),
             ExportColumn::make('partner_display_name')
-             ->label('name'),
+                ->label('name'),
             ExportColumn::make('type'),
             ExportColumn::make('total_amount'),
             ExportColumn::make('remaining_amount'),
