@@ -14,6 +14,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
+
+
 use App\Http\Controllers\ExportPdfController;
 
 Route::get('/export/transactions/pdf', [ExportPdfController::class, 'transactions'])

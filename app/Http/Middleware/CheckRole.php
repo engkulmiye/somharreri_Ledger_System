@@ -8,13 +8,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle($request, Closure $next, ...$roles)
     {
         if (! auth()->check()) {
-            return redirect()->route('login');
+            abort(403);
         }
 
-        if (auth()->user()->type !== $role) {
+        if (! in_array(auth()->user()->type, $roles)) {
             abort(403);
         }
 
