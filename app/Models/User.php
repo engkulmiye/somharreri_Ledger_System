@@ -61,7 +61,7 @@ class User extends Authenticatable
         return strtolower(trim($this->type)) === 'user';
     }
 
-    public function isManager(): bool
+    public function isManger(): bool
     {
         return strtolower(trim($this->type)) === 'manager';
     }
