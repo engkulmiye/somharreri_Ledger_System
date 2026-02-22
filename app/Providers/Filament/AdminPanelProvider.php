@@ -27,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login(null)
+            ->login()
             ->authGuard('web')
             ->darkMode(true)
 
