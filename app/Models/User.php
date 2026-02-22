@@ -71,7 +71,7 @@ class User extends Authenticatable
         return match ($panel->getId()) {
             'admin' => $this->type === 'admin',
             'user'  => $this->type === 'user',
-            default => true,
+            default => false,
         };
     }
 }

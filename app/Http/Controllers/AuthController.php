@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Filament\Facades\Filament;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,8 +27,8 @@ class AuthController extends Controller
             $user = Auth::user();
 
             return match ($user->type) {
-                'admin' => redirect('/admin'),
-                'user'  => redirect('/user'),
+                'admin' => redirect()->to(Filament::getPanel('admin')->getUrl()),
+                'user'  => redirect()->to(Filament::getPanel('user')->getUrl()),
                 default => abort(403),
             };
         }
