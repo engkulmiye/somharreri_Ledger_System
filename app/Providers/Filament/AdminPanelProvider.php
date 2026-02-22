@@ -28,7 +28,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->authGuard('web')
+            ->brandName('Somaharrir.')
+            ->brandLogo(null)
             ->darkMode(true)
 
             ->colors([

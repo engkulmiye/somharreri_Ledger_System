@@ -26,7 +26,8 @@ class UserPanelProvider extends PanelProvider
             ->id('user')
             ->path('user')
             ->login()
-            ->authGuard('web')
+            ->brandName('Ledger.')
+            ->brandLogo(null)
             ->colors([
                 'primary' => Color::Amber,
             ])
