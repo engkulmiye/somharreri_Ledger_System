@@ -29,7 +29,7 @@ class AuthController extends Controller
             return match ($user->type) {
                 'admin' => redirect()->to(Filament::getPanel('admin')->getUrl()),
                 'user'  => redirect()->to(Filament::getPanel('user')->getUrl()),
-                default => abort(403),
+                default => redirect('/'),
             };
         }
 
