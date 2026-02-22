@@ -8,11 +8,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle($request, Closure $next, ...$roles)
     {
+        if (! auth()->check()) {
+            abort(403);
+        }
 
-        if (auth()->check() && auth()->user()->type !== $role) {
-            abort(403, 'You are not allowed to access this panel.');
+        if (! in_array(auth()->user()->type, $roles)) {
+            abort(403);
         }
 
         return $next($request);

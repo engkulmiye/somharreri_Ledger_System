@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 
+use Filament\Panel;
 
 class User extends Authenticatable
 {
@@ -50,18 +51,31 @@ class User extends Authenticatable
         ];
     }
 
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->type === 'admin';
+        return strtolower(trim($this->type)) === 'admin';
     }
 
-    public function isManger()
+    public function isUser(): bool
     {
-        return $this->type === 'manager';
+        return strtolower(trim($this->type)) === 'user';
     }
 
-    public function isUser()
+    public function isManager(): bool
     {
-        return $this->type === 'user';
+        return strtolower(trim($this->type)) === 'manager';
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if (! $this->is_active) {
+            return false;
+        }
+
+        return match ($panel->getId()) {
+            'admin' => $this->isAdmin(),
+            'user'  => $this->isUser(),
+            default => false,
+        };
     }
 }

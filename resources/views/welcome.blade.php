@@ -16,7 +16,7 @@
         Somharreri<span class="text-red-500">.</span>
     </div>
 
-    <a href="{{ route('filament.admin.auth.login') }}"
+    <a href="/login"
        class="px-5 py-2.5 rounded-lg bg-white text-black font-medium hover:bg-zinc-200 transition">
         Login
     </a>
@@ -38,7 +38,7 @@
         </p>
 
         <div class="mt-10 flex gap-4">
-            <a href="{{ route('filament.admin.auth.login') }}"
+            <a href="/login"
                class="px-7 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition">
                 Access Dashboard
             </a>
