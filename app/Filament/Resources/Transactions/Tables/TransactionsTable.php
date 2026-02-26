@@ -37,7 +37,9 @@ class TransactionsTable
                                 fn($q) =>
                                 $q->where('name', 'like', "%{$search}%")
                             );
-                    }),
+                    })
+                    ->badge(fn($record) => (bool) $record->manual_partner_name)
+                    ->color(fn($record) => $record->manual_partner_name ? 'danger' : 'gray'),
 
                 BadgeColumn::make('type')
                     ->colors([
