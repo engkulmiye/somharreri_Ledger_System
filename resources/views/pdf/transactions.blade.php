@@ -19,6 +19,27 @@
             font-size: 12px;
             margin-bottom: 20px;
         }
+         .header {
+        width: 100%;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #2563eb;
+        padding-bottom: 10px;
+    }
+
+     .header h2 {
+        margin: 0;
+        color: #2563eb;
+        font-size: 22px;
+      }
+
+      .meta {
+        margin-top: 5px;
+        font-size: 12px;
+    }
+
+    .meta strong {
+        color: #111827;
+    }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -42,33 +63,58 @@
 </head>
 <body>
 
-<div class="title">TRANSACTIONS REPORT</div>
-<div class="subtitle">Generated on {{ now()->format('d M Y H:i') }}</div>
 
-<table>
+
+<div class="header">
+        <h2>Company Transactions Report</h2>
+        <div class="meta">
+            <strong>From:</strong> Galaal Hashi <br>
+            <strong>Date:</strong> {{ now()->format('d M Y') }}
+        </div>
+    </div>
+<table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse; font-size: 12px;">
     <thead>
-        <tr>
-            <th>#</th>
+        <tr style="background:#111827;color:white;">
             <th>Date</th>
-            <th>Customer</th>
+            <th>Name</th>
             <th>Type</th>
-            <th>Total</th>
-            <th>Remaining</th>
-            <th>Status</th>
+            <th>Total Amount</th>
+            <th>Commission</th>
+            <th>Resto</th>
         </tr>
     </thead>
+
     <tbody>
-        @foreach($transactions as $row)
-            <tr>
-                <td>{{ $row->id }}</td>
-                <td>{{ $row->date }}</td>
-                <td>{{ $row->partner_display_name }}</td>
-                <td>{{ ucfirst($row->type) }}</td>
-                <td>${{ number_format($row->total_amount, 2) }}</td>
-                <td>${{ number_format($row->remaining_amount, 2) }}</td>
-                <td>{{ ucfirst($row->status) }}</td>
-            </tr>
+        @foreach ($transactions as $tx)
+        <tr style="border-bottom:1px solid #ddd;">
+            <td>{{ $tx->date }}</td>
+
+            <td style="
+                color: {{ $tx->manual_partner_name ? '#dc2626' : '#000' }};
+                font-weight: {{ $tx->manual_partner_name ? 'bold' : 'normal' }};
+            ">
+                {{ $tx->partner_display_name }}
+            </td>
+
+            <td>{{ ucfirst($tx->type) }}</td>
+
+            <td style="text-align:right">${{ number_format($tx->total_amount, 2) }}</td>
+            <td style="text-align:right">${{ number_format($tx->commission_amount, 2) }}</td>
+            <td style="text-align:right">${{ number_format($tx->remaining_amount, 2) }}</td>
+        </tr>
         @endforeach
+
+       <tr style="font-weight:bold;background:#f3f4f6;">
+    <td colspan="4" style="text-align:right;">TOTAL</td>
+
+    <td style="text-align:right;">
+        ${{ number_format($transactions->sum('commission_amount'), 2) }}
+    </td>
+
+    <td style="text-align:right;">
+        ${{ number_format($transactions->sum('remaining_amount'), 2) }}
+    </td>
+   </tr>
     </tbody>
 </table>
 

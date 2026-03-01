@@ -2,7 +2,8 @@
 
 namespace App\Filament\User\Widgets;
 
-use App\Models\Transaction;
+use App\Models\CustomerTransaction;
+
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
@@ -16,22 +17,22 @@ class TransactionPieChartWidget extends ChartWidget
     protected static ?int $sort = 2;
     protected function getData(): array
     {
-         $stats = Transaction::select('type', DB::raw('COUNT(*) as total'))
-        ->groupBy('type')
-        ->get();
+        $stats = CustomerTransaction::select('type', DB::raw('COUNT(*) as total'))
+            ->groupBy('type')
+            ->get();
 
-    return [
-        'datasets' => [
-            [
-                'data' => $stats->pluck('total')->toArray(),
-                'label' => 'Transactions'
+        return [
+            'datasets' => [
+                [
+                    'data' => $stats->pluck('total')->toArray(),
+                    'label' => 'Transactions'
 
+                ],
             ],
-        ],
-        'labels' => $stats->pluck('type')
-            ->map(fn ($t) => ucfirst($t))
-            ->toArray(),
-    ];
+            'labels' => $stats->pluck('type')
+                ->map(fn($t) => ucfirst($t))
+                ->toArray(),
+        ];
     }
 
     protected function getType(): string

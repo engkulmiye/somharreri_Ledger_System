@@ -2,7 +2,8 @@
 
 namespace App\Filament\User\Widgets;
 
-use App\Filament\Resources\Transactions\TransactionResource;
+
+use App\Filament\User\Resources\CustomerTransactions\CustomerTransactionResource;
 use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -23,7 +24,7 @@ class LatestTransactionsWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(TransactionResource::getEloquentQuery())
+            ->query(CustomerTransactionResource::getEloquentQuery())
 
             ->defaultPaginationPageOption(5)
 
@@ -32,53 +33,59 @@ class LatestTransactionsWidget extends TableWidget
             ->columns([
                 TextColumn::make('date')->sortable(),
 
-TextColumn::make('partner_display_name')
-    ->label('Partner')
-    ->searchable(query: function ($query, string $search) {
-    $query->where('type', 'like', "%{$search}%")
-        ->orWhere('manual_partner_name', 'like', "%{$search}%")
-        ->orWhereHas('partner', fn ($q) =>
-            $q->where('name', 'like', "%{$search}%")
-        );
-}),
+                TextColumn::make('partner_display_name')
+                    ->label('Customer Name')
+                    ->searchable(query: function ($query, string $search) {
+                        $query->where('type', 'like', "%{$search}%")
+                            ->orWhere('manual_partner_name', 'like', "%{$search}%")
+                            ->orWhereHas(
+                                'customer',
+                                fn($q) =>
+                                $q->where('name', 'like', "%{$search}%")
+                            );
+                    })
+                    ->badge(fn($record) => (bool) $record->manual_partner_name)
+                    ->color(fn($record) => $record->manual_partner_name ? 'blue' : 'gray'),
 
-BadgeColumn::make('type')
-    ->colors([
-        'danger' => 'debt',
-        'success' => 'payment',
-    ]) ->searchable(),
+                TextColumn::make('manual_partner_name')
+                    ->label('Description')
+                    ->searchable(),
 
-TextColumn::make('amount_usd')->money('USD'),
+                BadgeColumn::make('type')
+                    ->colors([
+                        'danger' => 'debt',
+                        'success' => 'payment',
+                    ])->searchable(),
 
-TextColumn::make('commission_amount')
-    ->money('USD'),
+                TextColumn::make('amount_usd')
+                    ->money('USD')
+                    ->weight('bold'),
+
+                TextColumn::make('commission_amount')
+                    ->weight('bold')
+                    ->money('USD'),
 
 
-BadgeColumn::make('status')
-    ->colors([
-        'warning' => 'open',
-        'success' => 'paid',
-    ])
-    ->formatStateUsing(fn ($state, $record) =>
-        $record && $record->type === 'debt'
-            ? ucfirst($state)
-            : 'paid'
-    ),
+                BadgeColumn::make('status')
+                    ->colors([
+                        'warning' => 'open',
+                        'success' => 'paid',
+                    ])
+                    ->formatStateUsing(
+                        fn($state, $record) =>
+                        $record && $record->type === 'debt'
+                            ? ucfirst($state)
+                            : '-'
+                    ),
 
-TextColumn::make('paid_at')
-    ->date()
-    ->label('Paid On')
-    ->formatStateUsing(fn ($state, $record) =>
-        $record && $record->status === 'paid'
-            ? $state
-            : '—'
-    ) ->sortable(),
 
-TextColumn::make('total_amount')
-    ->money('USD')
-    ->color(fn ($record) =>
-        $record->total_amount < 0 ? 'success' : 'danger'
-    )
+                TextColumn::make('total_amount')
+                    ->weight('bold')
+                    ->money('USD')
+                    ->color(
+                        fn($record) =>
+                        $record->total_amount < 0 ? 'success' : 'danger'
+                    ),
             ])
             ->filters([
                 //

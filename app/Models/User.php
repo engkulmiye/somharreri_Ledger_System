@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -61,7 +61,7 @@ class User extends Authenticatable
         return strtolower(trim($this->type)) === 'user';
     }
 
-    public function isManager(): bool
+    public function isManger(): bool
     {
         return strtolower(trim($this->type)) === 'manager';
     }

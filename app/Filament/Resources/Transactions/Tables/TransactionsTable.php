@@ -37,7 +37,9 @@ class TransactionsTable
                                 fn($q) =>
                                 $q->where('name', 'like', "%{$search}%")
                             );
-                    }),
+                    })
+                    ->badge(fn($record) => (bool) $record->manual_partner_name)
+                    ->color(fn($record) => $record->manual_partner_name ? 'danger' : 'gray'),
 
                 BadgeColumn::make('type')
                     ->colors([
@@ -45,10 +47,13 @@ class TransactionsTable
                         'success' => 'payment',
                     ])->searchable(),
 
-                TextColumn::make('amount_usd')->money('USD'),
+                TextColumn::make('amount_usd')
+                    ->money('USD')
+                    ->weight('bold'),
 
                 TextColumn::make('commission_amount')
-                    ->money('USD'),
+                    ->money('USD')
+                    ->weight('bold'),
 
 
                 BadgeColumn::make('status')
@@ -75,6 +80,7 @@ class TransactionsTable
 
                 TextColumn::make('total_amount')
                     ->money('USD')
+                    ->weight('bold')
                     ->color(
                         fn($record) =>
                         $record->total_amount < 0 ? 'success' : 'danger'

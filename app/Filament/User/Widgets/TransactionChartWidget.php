@@ -2,8 +2,9 @@
 
 namespace App\Filament\User\Widgets;
 
+use App\Models\CustomerTransaction;
 use Filament\Widgets\ChartWidget;
-use App\Models\Transaction;
+
 
 use Flowframe\Trend\Trend;
 use Illuminate\Support\Carbon;
@@ -23,14 +24,14 @@ class TransactionChartWidget extends ChartWidget
     protected static ?int $sort = 2;
 
     protected function getFilters(): ?array
-{
-    return [
-        'today' => 'Today',
-        'week' => 'Last week',
-        'month' => 'Last month',
-        'year' => 'This year',
-    ];
-}
+    {
+        return [
+            'today' => 'Today',
+            'week' => 'Last week',
+            'month' => 'Last month',
+            'year' => 'This year',
+        ];
+    }
     protected function getData(): array
     {
         $data = $this->getTransactionPerMonth();
@@ -58,24 +59,22 @@ class TransactionChartWidget extends ChartWidget
     private function getTransactionPerMonth(): array
 
     {
-       $now = Carbon::now();
+        $now = Carbon::now();
 
-       $transactionsPerMonth = [];
+        $transactionsPerMonth = [];
 
-       $months = collect(range(1, 12))->map(function($month) use ($now, &$transactionsPerMonth) {
+        $months = collect(range(1, 12))->map(function ($month) use ($now, &$transactionsPerMonth) {
 
-       $count = Transaction::whereMonth('created_at', Carbon::parse($now->month($month)->format('Y-m')))->count();
+            $count = CustomerTransaction::whereMonth('created_at', Carbon::parse($now->month($month)->format('Y-m')))->count();
 
-       $transactionsPerMonth[] = $count;
+            $transactionsPerMonth[] = $count;
 
-       return $now->month($month)->format('M');
+            return $now->month($month)->format('M');
+        })->toArray();
 
-       })->toArray();
-
-       return [
-         'transactionsPerMonth' => $transactionsPerMonth,
-         'months' => $months
-       ];
-
+        return [
+            'transactionsPerMonth' => $transactionsPerMonth,
+            'months' => $months
+        ];
     }
 }

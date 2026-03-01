@@ -12,7 +12,7 @@ use App\Models\Partner;
 class Transaction extends Model
 {
 
- protected $fillable = [
+    protected $fillable = [
         'date',
         'partner_id',
         'manual_partner_name',
@@ -57,6 +57,28 @@ class Transaction extends Model
     }
 
 
+    /* ================= Scopes ================= */
+
+    public function scopeOpenDebts($query)
+    {
+        return $query
+            ->where('type', 'debt')
+            ->where('status', 'open');
+    }
+
+    public static function getUniqueOpenDebts()
+    {
+        return self::openDebts()
+            ->get()
+            ->groupBy(function ($debt) {
+                return $debt->partner_display_name;
+            })
+            ->map(function ($group) {
+                // Return the latest open debt for same name
+                return $group->sortByDesc('id')->first();
+            });
+    }
+
 
 
 
@@ -79,7 +101,7 @@ class Transaction extends Model
             if ($tx->type === 'payment') {
                 $tx->commission_amount = ($tx->amount_usd * $tx->commission_rate) / 100;
                 $tx->total_amount =
-                $tx->amount_usd + $tx->commission_amount;
+                    $tx->amount_usd + $tx->commission_amount;
             }
         });
 
@@ -99,36 +121,36 @@ class Transaction extends Model
         });
 
         // When a DEBT is created
-    static::creating(function ($transaction) {
-        if ($transaction->type === 'debt') {
-            $transaction->remaining_amount = $transaction->total_amount;
-            $transaction->status = 'open';
-        }
-    });
+        static::creating(function ($transaction) {
+            if ($transaction->type === 'debt') {
+                $transaction->remaining_amount = $transaction->total_amount;
+                $transaction->status = 'open';
+            }
+        });
 
-    // When a PAYMENT is created
-    static::created(function ($transaction) {
-        if ($transaction->type !== 'payment' || !$transaction->parent_debt_id) {
-            return;
-        }
+        // When a PAYMENT is created
+        static::created(function ($transaction) {
 
-        $debt = self::find($transaction->parent_debt_id);
+            if ($transaction->type !== 'payment' || !$transaction->parent_debt_id) {
+                return;
+            }
 
-        if (!$debt) {
-            return;
-        }
+            $debt = self::find($transaction->parent_debt_id);
 
-        $debt->remaining_amount -= $transaction->amount_usd;
+            if (!$debt) {
+                return;
+            }
 
-        if ($debt->remaining_amount <= 0) {
-            $debt->remaining_amount = 0;
-            $debt->status = 'paid';
-            $debt->paid_at = now();
-        }
+            // ✅ Subtract FULL payment including commission
+            $debt->remaining_amount -= $transaction->total_amount;
 
-        $debt->save();
-    });
+            if ($debt->remaining_amount <= 0) {
+                $debt->remaining_amount = 0;
+                $debt->status = 'paid';
+                $debt->paid_at = now();
+            }
 
+            $debt->save();
+        });
     }
-
 }

@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\Partners\RelationManagers;
 
-use Filament\Actions\AssociateAction;
+
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
+
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
+
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
@@ -35,39 +35,39 @@ class TransactionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                 TextColumn::make('id')->label('ID')->sortable(),
+                TextColumn::make('id')->label('ID')->sortable(),
 
-            TextColumn::make('type')
-                ->badge()
-                ->colors([
-                    'danger' => 'debt',
-                    'success' => 'payment',
-                ]),
+                TextColumn::make('type')
+                    ->badge()
+                    ->colors([
+                        'danger' => 'debt',
+                        'success' => 'payment',
+                    ]),
 
-            TextColumn::make('total_amount')
-                ->label('Amount')
-                ->money('USD')
-                ->sortable(),
+                TextColumn::make('total_amount')
+                    ->label('Amount')
+                    ->weight('bold')
+                    ->money('USD')
+                    ->sortable(),
 
-            TextColumn::make('remaining_amount')
-                ->label('Remaining')
-                ->money('USD')
-                ->color('danger'),
+                TextColumn::make('remaining_amount')
+                    ->label('Remaining')
+                    ->weight('bold')
+                    ->money('USD')
+                    ->color('danger'),
 
-            TextColumn::make('date')
-                ->date()
-                ->sortable(),
+                TextColumn::make('date')
+                    ->date()
+                    ->sortable(),
 
-            TextColumn::make('status')
-                ->badge()
-                ->color(fn ($state) => $state === 'open' ? 'danger' : 'success'),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn($state) => $state === 'open' ? 'danger' : 'success'),
             ])
             ->filters([
                 //
             ])
-            ->headerActions([
-
-            ])
+            ->headerActions([])
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
