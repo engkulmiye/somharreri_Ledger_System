@@ -15,6 +15,7 @@ use Filament\Schemas\Components\Utilities\Set;
 
 use App\Models\Partner;
 use App\Models\Transaction;
+use Filament\Forms\Components\Placeholder;
 
 class TransactionForm
 {
@@ -28,11 +29,13 @@ class TransactionForm
                         'debt' => 'Company Owes',
                         'payment' => 'Company Paid',
                     ])
+                    ->live()
                     ->required()
                     ->reactive(),
 
                 Select::make('partner_id')
                     ->label('Partner')
+                    ->live()
                     ->options(Partner::where('is_active', true)->pluck('name', 'id'))
                     ->searchable()
                     ->reactive()
@@ -80,6 +83,7 @@ class TransactionForm
                 TextInput::make('amount_usd')
                     ->label('Amount (USD)')
                     ->numeric()
+                    ->live()
                     ->required(),
 
                 TextInput::make('commission_rate')
@@ -87,19 +91,6 @@ class TransactionForm
                     ->default(1.2)
                     ->visible(fn($get) => $get('type') === 'debt'),
 
-                Select::make('parent_debt_id')
-                    ->label('Paying Which Debt?')
-                    ->options(function () {
-                        return Transaction::getUniqueOpenDebts()
-                            ->mapWithKeys(function ($debt) {
-                                return [
-                                    $debt->id => $debt->partner_display_name . ' (Balance: $' . number_format($debt->remaining_amount, 2) . ')'
-                                ];
-                            });
-                    })
-                    ->searchable()
-                    ->visible(fn($get) => $get('type') === 'payment')
-                    ->required(fn($get) => $get('type') === 'payment'),
 
                 Textarea::make('notes'),
             ]);

@@ -109,15 +109,14 @@ class TransactionsTable
                 BulkActionGroup::make([
                     ExportBulkAction::make()
                         ->exporter(TransactionExporter::class),
-
-                    ActionsAction::make('pdf')
-                        ->label('Export PDF')
-                        ->icon('heroicon-o-document-arrow-down')
-                        ->color('danger')
-                        ->url(route('export.transactions.pdf'))
-                        ->openUrlInNewTab(),
                     DeleteBulkAction::make(),
                 ]),
+                ActionsAction::make('pdf')
+                    ->label('Export PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('danger')
+                    ->url(route('export.transactions.pdf'))
+                    ->openUrlInNewTab(),
             ]);
     }
 }

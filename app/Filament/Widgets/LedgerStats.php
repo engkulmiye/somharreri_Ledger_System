@@ -26,20 +26,22 @@ class LedgerStats extends StatsOverviewWidget
             ->where('status', 'open')
             ->get();
 
-        $totalRemaining = $openDebts->sum(fn($debt) => $debt->remaining_amount);
+        $totalDebt  = Transaction::where('type', 'debt')->sum('total_amount');
 
-        $totalPaid = Transaction::where('type', 'payment')->sum('total_amount');
+        $totalPayment  = Transaction::where('type', 'payment')->sum('total_amount');
+
+        $runningBalance = $totalDebt - $totalPayment;
 
         $totalCommission = Transaction::sum('commission_amount');
 
         return [
-            Stat::make('Wadarta deyn', Number::currency($totalRemaining, 'USD'))
+            Stat::make('Wadarta deyn', Number::currency($runningBalance, 'USD'))
                 ->description('Deynta Company ee aan la bixin')
                 ->descriptionIcon('heroicon-m-exclamation-circle')
                 ->color('danger')
                 ->chart([7, 3, 4, 5, 6, 3, 5, 2]),
 
-            Stat::make('Wadarta La Bixiyay', Number::currency($totalPaid, 'USD'))
+            Stat::make('Wadarta La Bixiyay', Number::currency($totalPayment, 'USD'))
                 ->description('Wadarta lacagaha la ururiyey')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success')

@@ -14,42 +14,38 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
 
-    $table->date('date');
+            $table->date('date');
 
-    // Partner logic
-    $table->foreignId('partner_id')->nullable()->constrained()->nullOnDelete();
-    $table->string('manual_partner_name')->nullable();
+            // Partner logic
+            $table->foreignId('partner_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('manual_partner_name')->nullable();
 
-    // Type
-    $table->enum('type', ['debt', 'payment']);
+            // Type
+            $table->enum('type', ['debt', 'payment']);
 
-    // Money
-    $table->decimal('cash_ksh', 15, 2)->nullable();
-    $table->decimal('rate', 8, 2)->nullable();
-    $table->decimal('amount_usd', 15, 2);
+            // Money
+            $table->decimal('cash_ksh', 15, 2)->nullable();
+            $table->decimal('rate', 8, 2)->nullable();
+            $table->decimal('amount_usd', 15, 2);
 
-    // Commission
-    $table->decimal('commission_rate', 5, 2)->default(0);
-    $table->decimal('commission_amount', 15, 2)->default(0);
+            // Commission
+            $table->decimal('commission_rate', 5, 2)->default(0);
+            $table->decimal('commission_amount', 15, 2)->default(0);
 
-    // Totals
-    $table->decimal('total_amount', 15, 2);
+            // Totals
+            $table->decimal('total_amount', 15, 2);
 
-    // Debt tracking
-    $table->enum('status', ['open', 'paid'])->default('open');
-    $table->date('paid_at')->nullable();
+            // Debt tracking
+            $table->enum('status', ['open', 'paid'])->default('open');
+            $table->date('paid_at')->nullable();
 
-    $table->decimal('remaining_amount', 15, 2)->default(0);
 
-    // Payment → Debt relation
-    $table->foreignId('parent_debt_id')
-        ->nullable()
-        ->constrained('transactions')
-        ->nullOnDelete();
 
-    $table->text('notes')->nullable();
 
-    $table->timestamps();
+
+            $table->text('notes')->nullable();
+
+            $table->timestamps();
         });
     }
 

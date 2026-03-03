@@ -72,15 +72,24 @@
             <strong>Date:</strong> {{ now()->format('d M Y') }}
         </div>
     </div>
+
+@php
+    $totalDebt = $transactions->where('type', 'debt')->sum('total_amount');
+    $totalPayment = $transactions->where('type', 'payment')->sum('total_amount');
+    $runningBalance = $totalDebt - $totalPayment;
+@endphp
+
 <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse; font-size: 12px;">
     <thead>
         <tr style="background:#111827;color:white;">
             <th>Date</th>
             <th>Name</th>
             <th>Type</th>
-            <th>Total Amount</th>
+            <th>Amount USD</th>
             <th>Commission</th>
-            <th>Resto</th>
+            <th>Total Amount</th>
+
+
         </tr>
     </thead>
 
@@ -98,23 +107,34 @@
 
             <td>{{ ucfirst($tx->type) }}</td>
 
+            <td style="text-align:right">${{ number_format($tx->amount_usd, 2) }}</td>
+                        <td style="text-align:right">${{ number_format($tx->commission_amount, 2) }}</td>
             <td style="text-align:right">${{ number_format($tx->total_amount, 2) }}</td>
-            <td style="text-align:right">${{ number_format($tx->commission_amount, 2) }}</td>
-            <td style="text-align:right">${{ number_format($tx->remaining_amount, 2) }}</td>
+
+
         </tr>
         @endforeach
 
-       <tr style="font-weight:bold;background:#f3f4f6;">
-    <td colspan="4" style="text-align:right;">TOTAL</td>
-
-    <td style="text-align:right;">
-        ${{ number_format($transactions->sum('commission_amount'), 2) }}
+      <tr style="font-weight:bold;background:#1e3a8a; color:white;">
+    <td colspan="5" style="text-align:right;">Wadarta Deyn</td>
+    <td colspan="1" style="text-align:right;">
+        ${{ number_format($totalDebt, 2) }}
     </td>
+</tr>
 
-    <td style="text-align:right;">
-        ${{ number_format($transactions->sum('remaining_amount'), 2) }}
+<tr style="font-weight:bold;background:#59e58a; color:white;">
+    <td colspan="5" style="text-align:right;">Wadarta La Bixiyay</td>
+    <td colspan="1" style="text-align:right;">
+        ${{ number_format($totalPayment, 2) }}
     </td>
-   </tr>
+</tr>
+
+<tr style="font-weight:bold;background:#d34c4c; color:white;">
+    <td colspan="5" style="text-align:right;">Resto Balance</td>
+    <td colspan="1" style="text-align:right;">
+        ${{ number_format($runningBalance, 2) }}
+    </td>
+</tr>
     </tbody>
 </table>
 

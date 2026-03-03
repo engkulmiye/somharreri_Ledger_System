@@ -23,10 +23,7 @@ class Transaction extends Model
         'commission_rate',
         'commission_amount',
         'total_amount',
-        'remaining_amount',
-        'status',
-        'paid_at',
-        'parent_debt_id',
+        'running_balance',
         'notes',
     ];
 
@@ -39,15 +36,6 @@ class Transaction extends Model
         return $this->belongsTo(Partner::class);
     }
 
-    public function debt()
-    {
-        return $this->belongsTo(Transaction::class, 'parent_debt_id');
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Transaction::class, 'parent_debt_id');
-    }
 
     /* ================= Accessors ================= */
 
@@ -57,100 +45,35 @@ class Transaction extends Model
     }
 
 
-    /* ================= Scopes ================= */
-
-    public function scopeOpenDebts($query)
-    {
-        return $query
-            ->where('type', 'debt')
-            ->where('status', 'open');
-    }
-
-    public static function getUniqueOpenDebts()
-    {
-        return self::openDebts()
-            ->get()
-            ->groupBy(function ($debt) {
-                return $debt->partner_display_name;
-            })
-            ->map(function ($group) {
-                // Return the latest open debt for same name
-                return $group->sortByDesc('id')->first();
-            });
-    }
-
-
-
 
     /* ================= Auto Logic ================= */
 
     protected static function booted()
     {
-        static::saving(function ($tx) {
 
-            // Commission only on debt
-            if ($tx->type === 'debt') {
-                $tx->commission_amount =
-                    ($tx->amount_usd * $tx->commission_rate) / 100;
+        static::creating(function ($tx) {
 
-                $tx->total_amount =
-                    $tx->amount_usd + $tx->commission_amount;
+            // Calculate commission
+            $tx->commission_amount =
+                ($tx->amount_usd * $tx->commission_rate) / 100;
+
+            $tx->total_amount =
+                $tx->amount_usd + $tx->commission_amount;
+
+            // Get last balance for this partner
+            $lastBalance = self::where('partner_id', $tx->partner_id)
+                ->latest('id')
+                ->value('running_balance') ?? 0;
+
+            // If company paid → reduce balance
+            if ($tx->type === 'company_paid') {
+                $tx->running_balance = $lastBalance - $tx->total_amount;
             }
 
-            // Payments reduce balance
-            if ($tx->type === 'payment') {
-                $tx->commission_amount = ($tx->amount_usd * $tx->commission_rate) / 100;
-                $tx->total_amount =
-                    $tx->amount_usd + $tx->commission_amount;
+            // If company received or debt → increase balance
+            else {
+                $tx->running_balance = $lastBalance + $tx->total_amount;
             }
-        });
-
-        static::saved(function ($tx) {
-
-            // When payment saved → check debt
-            if ($tx->parent_debt_id) {
-                $debt = $tx->debt;
-
-                if ($debt && $debt->remaining_amount <= 0) {
-                    $debt->update([
-                        'status' => 'paid',
-                        'paid_at' => now(),
-                    ]);
-                }
-            }
-        });
-
-        // When a DEBT is created
-        static::creating(function ($transaction) {
-            if ($transaction->type === 'debt') {
-                $transaction->remaining_amount = $transaction->total_amount;
-                $transaction->status = 'open';
-            }
-        });
-
-        // When a PAYMENT is created
-        static::created(function ($transaction) {
-
-            if ($transaction->type !== 'payment' || !$transaction->parent_debt_id) {
-                return;
-            }
-
-            $debt = self::find($transaction->parent_debt_id);
-
-            if (!$debt) {
-                return;
-            }
-
-            // ✅ Subtract FULL payment including commission
-            $debt->remaining_amount -= $transaction->total_amount;
-
-            if ($debt->remaining_amount <= 0) {
-                $debt->remaining_amount = 0;
-                $debt->status = 'paid';
-                $debt->paid_at = now();
-            }
-
-            $debt->save();
         });
     }
 }
