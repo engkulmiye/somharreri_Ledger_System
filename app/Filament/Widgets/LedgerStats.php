@@ -26,7 +26,7 @@ class LedgerStats extends StatsOverviewWidget
             ->where('status', 'open')
             ->get();
 
-        $totalRemaining = $openDebts->sum(fn($debt) => $debt->remaining_amount);
+        $totalRemaining = Transaction::where('type', 'debt')->sum('total_amount');
 
         $totalPaid = Transaction::where('type', 'payment')->sum('total_amount');
 
