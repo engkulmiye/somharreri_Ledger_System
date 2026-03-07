@@ -143,11 +143,11 @@
             @endphp
 
             @foreach ($transactions as $row)
-                @php
-                    $totalAmount += $row->total_amount;
-                    $totalCommission += $row->commission_amount;
-                    $totalRemaining += $row->remaining_amount;
-                @endphp
+             @php
+    $totalDebt = $transactions->where('type', 'debt')->sum('total_amount');
+    $totalPayment = $transactions->where('type', 'payment')->sum('total_amount');
+    $runningBalance = $totalDebt - $totalPayment;
+            @endphp
 
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($row->date)->format('d M Y') }}</td>
@@ -170,7 +170,7 @@
     </td>
 
     <td style="text-align:center;">
-        ${{ number_format($transactions->sum('remaining_amount'), 2) }}
+        ${{ number_format($runningBalance), 2) }}
     </td>
    </tr>
         </tbody>
