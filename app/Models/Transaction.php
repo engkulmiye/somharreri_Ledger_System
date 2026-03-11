@@ -51,7 +51,7 @@ class Transaction extends Model
     protected static function booted()
     {
 
-        static::creating(function ($tx) {
+        static::saving(function ($tx) {
 
             // Calculate commission
             $tx->commission_amount =
