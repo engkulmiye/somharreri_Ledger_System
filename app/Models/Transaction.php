@@ -44,6 +44,17 @@ class Transaction extends Model
         return $this->partner?->name ?? $this->manual_partner_name;
     }
 
+        public function getPreviousTotalAttribute()
+    {
+        return self::where('partner_id', $this->partner_id)
+            ->where('id', '<', $this->id)
+            ->sum('total_amount');
+    }
+
+    public function getAccumulatedTotalAttribute()
+    {
+        return $this->previous_total + $this->total_amount;
+    }
 
 
     /* ================= Auto Logic ================= */
