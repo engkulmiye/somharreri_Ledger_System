@@ -143,7 +143,7 @@
             @endphp
 
             @foreach ($transactions as $row)
-                @php
+                 @php
                     $totalAmount += $row->total_amount;
                     $totalCommission += $row->commission_amount;
                     $totalRemaining += $row->remaining_amount;
