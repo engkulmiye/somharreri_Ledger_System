@@ -76,14 +76,15 @@ class TransactionInfolist
                     ->numeric()
                     ->weight('bold')
                     ->color('primary'),
-                TextEntry::make('previous_total')
+                                TextEntry::make('previous_balance')
                                     ->label('Previous Balance')
                                     ->money('USD')
                                     ->weight('bold')
                                     ->color('gray'),
+                                
 
-                TextEntry::make('accumulated_total')
-                                    ->label('Running Total')
+                                TextEntry::make('running_ledger_balance')
+                                    ->label('Running Balance')
                                     ->money('USD')
                                     ->weight('bold')
                                     ->color('success'),
