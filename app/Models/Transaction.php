@@ -44,18 +44,49 @@ class Transaction extends Model
         return $this->partner?->name ?? $this->manual_partner_name;
     }
 
-        public function getPreviousTotalAttribute()
+    public function getPreviousBalanceAttribute()
     {
-        return self::where('partner_id', $this->partner_id)
-            ->where('id', '<', $this->id)
-            ->sum('total_amount');
+        $transactions = self::where(function ($query) {
+            $query->whereDate('date', '<', $this->date)
+                ->orWhere(function ($q) {
+                    $q->whereDate('date', $this->date)
+                        ->where('id', '<', $this->id);
+                });
+        })
+            ->orderBy('date')
+            ->orderBy('id')
+            ->get();
+
+        $balance = 0;
+
+        foreach ($transactions as $tx) {
+
+            if ($tx->type === 'debt') {
+                $balance += $tx->total_amount;
+            }
+
+            if ($tx->type === 'payment' || $tx->type === 'company_paid') {
+                $balance -= $tx->total_amount;
+            }
+        }
+
+        return $balance;
     }
 
-    public function getAccumulatedTotalAttribute()
+    public function getRunningLedgerBalanceAttribute()
     {
-        return $this->previous_total + $this->total_amount;
-    }
+        $balance = $this->previous_balance;
 
+        if ($this->type === 'debt') {
+            $balance += $this->total_amount;
+        }
+
+        if ($this->type === 'payment' || $this->type === 'company_paid') {
+            $balance -= $this->total_amount;
+        }
+
+        return $balance;
+    }
 
     /* ================= Auto Logic ================= */
 
