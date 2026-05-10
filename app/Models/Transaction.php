@@ -44,6 +44,57 @@ class Transaction extends Model
         return $this->partner?->name ?? $this->manual_partner_name;
     }
 
+    public function getPreviousBalanceAttribute()
+    {
+        $transactions = self::where(function ($query) {
+            $query->whereDate('date', '<', $this->date)
+                ->orWhere(function ($q) {
+                    $q->whereDate('date', $this->date)
+                        ->where('id', '<', $this->id);
+                });
+        })
+            ->orderBy('date')
+            ->orderBy('id')
+            ->get();
+
+        $balance = 0;
+
+        foreach ($transactions as $tx) {
+
+            if ($tx->type === 'debt') {
+                $balance += $tx->total_amount;
+            }
+
+            if ($tx->type === 'payment' || $tx->type === 'company_paid') {
+                $balance -= $tx->total_amount;
+            }
+        }
+
+        return $balance;
+    }
+
+    public function getRunningLedgerBalanceAttribute()
+    {
+        $balance = $this->previous_balance;
+
+        if ($this->type === 'debt') {
+            $balance += $this->total_amount;
+        }
+
+        if ($this->type === 'payment' || $this->type === 'company_paid') {
+            $balance -= $this->total_amount;
+        }
+
+        return $balance;
+    }
+
+    public function getTypeEffectAttribute()
+    {
+        return in_array($this->type, ['payment', 'company_paid'])
+            ? '-'
+            : '+';
+    }
+
 
 
     /* ================= Auto Logic ================= */
@@ -51,7 +102,7 @@ class Transaction extends Model
     protected static function booted()
     {
 
-        static::creating(function ($tx) {
+        static::saving(function ($tx) {
 
             // Calculate commission
             $tx->commission_amount =

@@ -95,7 +95,6 @@ class CustomerTransactionForm
 
                         $total = CustomerTransaction::where('customer_id', $customerId)
                             ->where('type', 'debt')
-                            ->where('status', 'open')
                             ->sum('remaining_amount');
 
                         return '$' . number_format($total, 2);

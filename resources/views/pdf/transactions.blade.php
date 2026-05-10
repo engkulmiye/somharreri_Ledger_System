@@ -115,6 +115,8 @@
         </tr>
         @endforeach
 
+
+
       <tr style="font-weight:bold;background:#1e3a8a; color:white;">
     <td colspan="5" style="text-align:right;">Wadarta Deyn</td>
     <td colspan="1" style="text-align:right;">

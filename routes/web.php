@@ -26,3 +26,9 @@ Route::get(
     '/customers/{customer}/transactions/pdf',
     [CustomerTransactionPdfController::class, 'export']
 )->name('customer.transactions.pdf');
+
+
+use App\Http\Controllers\StatementPdfController;
+
+Route::get('/statement/pdf', [StatementPdfController::class, 'download'])
+    ->name('statement.pdf');
